@@ -102,7 +102,7 @@ vim.g.have_nerd_font = false
 vim.opt.number = true
 -- You can also add relative line numbers, for help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -139,14 +139,14 @@ vim.opt.splitbelow = true
 -- Sets how neovim will display certain whitespace in the editor.
 --  See `:help 'list'`
 --  and `:help 'listchars'`
-vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+-- vim.opt.list = true
+-- vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
 
 -- Show which line your cursor is on
-vim.opt.cursorline = true
+vim.opt.cursorline = false
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
@@ -210,6 +210,55 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+-- NOTE: This is where all the vim plugins will go. In the future, there should be
+-- a way to switch over to lazy.
+local vim = vim
+local Plug = vim.fn['plug#']
+
+vim.call 'plug#begin'
+
+-- Shorthand notation; fetches https://github.com/junegunn/vim-easy-align
+Plug 'junegunn/vim-easy-align'
+
+-- Any valid git URL is allowed
+Plug 'https://github.com/junegunn/vim-github-dashboard.git'
+
+-- Multiple Plug commands can be written in a single line using ; separators
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+
+-- On-demand loading
+Plug('preservim/nerdtree', { ['on'] = 'NERDTreeToggle' })
+Plug('tpope/vim-fireplace', { ['for'] = 'clojure' })
+
+-- Using a non-default branch
+Plug('rdnetto/YCM-Generator', { ['branch'] = 'stable' })
+
+-- Using a tagged release; wildcard allowed (requires git 1.9.2 or above)
+Plug('fatih/vim-go', { ['tag'] = '*' })
+
+-- Plugin options
+Plug('nsf/gocode', { ['tag'] = 'v.20150303', ['rtp'] = 'vim' })
+
+-- Plugin outside ~/.vim/plugged with post-update hook
+Plug('junegunn/fzf', { ['dir'] = '~/.fzf', ['do'] = './install --all' })
+
+-- Unmanaged plugin (manually installed and updated)
+Plug '~/my-prototype-plugin'
+
+Plug 'f-person/git-blame.nvim'
+
+vim.call 'plug#end'
+
+require('gitblame').setup {
+  --Note how the `gitblame_` prefix is omitted in `setup`
+  enabled = true,
+  message_template = '<author> • <date> • <sha> • <summary>',
+  date_format = '%r',
+  virtual_text_column = 80,
+  use_blame_commit_file_urls = true,
+}
+
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -220,6 +269,7 @@ vim.opt.rtp:prepend(lazypath)
 --  To update plugins, you can run
 --    :Lazy update
 --
+
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
@@ -253,6 +303,19 @@ require('lazy').setup({
         changedelete = { text = '~' },
       },
     },
+  },
+  -- neogit
+  {
+    'NeogitOrg/neogit',
+    dependencies = {
+      'nvim-lua/plenary.nvim', -- required
+      'sindrets/diffview.nvim', -- optional - Diff integration
+
+      -- Only one of these is needed, not both.
+      'nvim-telescope/telescope.nvim', -- optional
+      'ibhagwan/fzf-lua', -- optional
+    },
+    config = true,
   },
 
   -- NOTE: Plugins can also be configured to run lua code when they are loaded.
@@ -373,7 +436,10 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-
+      vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
+      vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+      vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
+      vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to telescope to change theme, layout, etc.
