@@ -142,8 +142,9 @@ vim.opt.splitbelow = true
 -- Sets how neovim will display certain whitespace in the editor.
 --  See `:help 'list'`
 --  and `:help 'listchars'`
--- vim.opt.list = true
+vim.opt.list = true
 -- vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.listchars = { trail = '·' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -250,6 +251,7 @@ Plug('junegunn/fzf', { ['dir'] = '~/.fzf', ['do'] = './install --all' })
 Plug '~/my-prototype-plugin'
 
 Plug 'f-person/git-blame.nvim'
+Plug 'nvim-tree/nvim-web-devicons'
 
 vim.call 'plug#end'
 
@@ -261,6 +263,9 @@ require('gitblame').setup {
   virtual_text_column = 80,
   use_blame_commit_file_urls = true,
 }
+
+vim.keymap.set('n', '<leader>tt', ':NvimTreeToggle<CR>')
+vim.keymap.set('n', '<leader>ng', ':Neogit<CR>')
 
 -- [[ Configure and install plugins ]]
 --
@@ -319,6 +324,24 @@ require('lazy').setup({
       'ibhagwan/fzf-lua', -- optional
     },
     config = true,
+  },
+
+  {
+    'nvim-tree/nvim-tree.lua',
+    version = '*',
+    lazy = false,
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
+    },
+    config = function()
+      require('nvim-tree').setup {}
+    end,
+  },
+
+  -- trail whitespaces
+  {
+    'cappyzawa/trim.nvim',
+    opts = {},
   },
 
   -- theme
@@ -810,7 +833,8 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'catppuccin-mocha'
+      -- vim.cmd.colorscheme 'tokyonight-night'
 
       -- You can configure highlights by doing something like
       vim.cmd.hi 'Comment gui=none'
