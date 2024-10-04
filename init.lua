@@ -91,7 +91,20 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
+
+-- pbcopy config
+vim.g.clipboard = {
+  name = 'OSC 52',
+  copy = {
+    ['+'] = require('vim.ui.clipboard.osc52').copy '+',
+    ['*'] = require('vim.ui.clipboard.osc52').copy '*',
+  },
+  paste = {
+    ['+'] = require('vim.ui.clipboard.osc52').paste '+',
+    ['*'] = require('vim.ui.clipboard.osc52').paste '*',
+  },
+}
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -264,6 +277,10 @@ require('gitblame').setup {
   use_blame_commit_file_urls = true,
 }
 
+vim.api.nvim_create_user_command('CopyRelPath', "call setreg('+', expand('%'))", {})
+vim.keymap.set('n', '<leader>rel', ':CopyRelPath<CR>')
+
+vim.keymap.set('n', '<leader>cpc', ':GitBlameCopySHA<CR>')
 vim.keymap.set('n', '<leader>tt', ':NvimTreeToggle<CR>')
 vim.keymap.set('n', '<leader>ng', ':Neogit<CR>')
 
@@ -631,9 +648,10 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
+        clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        bashls = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
